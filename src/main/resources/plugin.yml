@@ -4,3 +4,8 @@ main: ac.grim.removehealthmetadata.RemoveHealthMetadata
 api-version: 1.13
 authors: [ DefineOutside ]
 description: Removes entity health metadata
+softdepend:
+  - ProtocolLib
+  - ProtocolSupport
+  - ViaVersion
+  - Geyser-Spigot
