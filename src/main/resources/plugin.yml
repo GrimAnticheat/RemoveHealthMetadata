@@ -1,0 +1,6 @@
+name: RemoveHealthMetadata
+version: '${version}'
+main: ac.grim.removehealthmetadata.RemoveHealthMetadata
+api-version: 1.13
+authors: [ DefineOutside ]
+description: Removes entity health metadata

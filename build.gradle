@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+publishing {
+    publications {
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
+        }
+    }
+}
+
+group = 'ac.grim'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven {
+        name = 'jitpack'
+        url = 'https://jitpack.io'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
+    implementation("com.github.retrooper.packetevents:spigot:2.0-SNAPSHOT")
+}
+
+shadowJar {
+    minimize()
+    relocate 'io.github.retrooper.packetevents', 'ac.grim.removehealthmetadata.shaded.io.github.retrooper.packetevents'
+    relocate 'com.github.retrooper.packetevents', 'ac.grim.removehealthmetadata.shaded.com.github.retrooper.packetevents'
+}
+
+def targetJavaVersion = 8
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
